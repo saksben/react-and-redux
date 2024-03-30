@@ -1,5 +1,6 @@
 // initial states
 export default {
     courses: [],
-    authors: []
+    authors: [],
+    apiCallsInProgress: 0
 }

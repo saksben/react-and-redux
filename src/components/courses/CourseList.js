@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
 // creates table of courses. The { courses } is destructuring props (from state) for courses, i.e. props.courses
-const CourseList = ({ courses }) => (
+const CourseList = ({ courses, onDeleteClick }) => (
   <table className="table">
     <thead>
       <tr>
@@ -11,6 +11,7 @@ const CourseList = ({ courses }) => (
         <th>Title</th>
         <th>Author</th>
         <th>Category</th>
+        <th />
       </tr>
     </thead>
     <tbody>
@@ -30,6 +31,14 @@ const CourseList = ({ courses }) => (
             </td>
             <td>{course.authorName}</td>
             <td>{course.category}</td>
+            <td>
+              <button
+                className="btn btn-outline-danger"
+                onClick={() => onDeleteClick(course)}
+              >
+                Delete
+              </button>
+            </td>
           </tr>
         );
       })}
@@ -40,6 +49,7 @@ const CourseList = ({ courses }) => (
 // imports Redux-stored courses state (destructured above to get)
 CourseList.propTypes = {
   courses: PropTypes.array.isRequired,
+  onDeleteClick: PropTypes.func.isRequired,
 };
 
 export default CourseList;

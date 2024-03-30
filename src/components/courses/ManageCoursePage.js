@@ -5,6 +5,8 @@ import { loadAuthors } from "../../redux/actions/authorActions";
 import PropTypes from "prop-types";
 import { newCourse } from "../../../tools/mockData";
 import CourseForm from "./CourseForm";
+import Spinner from "../common/Spinner";
+import { toast } from "react-toastify";
 
 // function-based React component
 function ManageCoursePage({
@@ -18,6 +20,7 @@ function ManageCoursePage({
 }) {
   const [course, setCourse] = useState({ ...props.course });
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     // checks to see if the api has already been called with data, else load stored courses
@@ -46,22 +49,48 @@ function ManageCoursePage({
     }));
   }
 
-  // When a new course is created via form, redirect to "/courses" page
-  function handleSave(event) {
-    event.preventDefault();
-    saveCourse(course).then(() => {
-      // Passed in on props so is already bound to dispatch
-      history.push("/courses"); // You can use <Redirect> or history to redirect. History is a React router object
-    });
+  // Validates form data on client side so it doesn't need to wait for api call to load
+  function formIsValid() {
+    const { title, authorId, category } = course;
+    const errors = {};
+
+    if (!title) errors.title = "Title is required.";
+    if (!authorId) errors.author = "Author is required.";
+    if (!category) errors.category = "Category is required.";
+
+    setErrors(errors);
+    // Form is valid if the errors object still has no properties
+    return Object.keys(errors).length === 0;
   }
 
-  return (
+  // When a new course is created via form, display Save loading change and redirect to "/courses" page
+  function handleSave(event) {
+    event.preventDefault();
+    if (!formIsValid()) return;
+    setSaving(true);
+    saveCourse(course)
+      .then(() => {
+        toast.success("Course saved.");
+        // Passed in on props so is already bound to dispatch
+        history.push("/courses"); // You can use <Redirect> or history to redirect. History is a React router object
+      })
+      .catch((error) => {
+        setSaving(false); // So user can try again
+        setErrors({ onSave: error.message });
+      });
+  }
+
+  // If api call is loading (either have 0), display spinner. Else display CourseForm
+  return authors.length === 0 || courses.length === 0 ? (
+    <Spinner />
+  ) : (
     <CourseForm
       course={course}
       errors={errors}
       authors={authors}
       onChange={handleChange}
       onSave={handleSave}
+      saving={saving}
     />
   );
 }
