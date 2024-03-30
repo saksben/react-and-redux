@@ -10,7 +10,9 @@ import { Provider as ReduxProvider } from "react-redux";
 const store = configureStore();
 
 render(
+    // applies Redux store
     <ReduxProvider store={store}>
+        {/* applies React routing */}
         <Router>
             <App />
         </Router>         
